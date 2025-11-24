@@ -1,5 +1,5 @@
 import { OpenAI } from 'openai';
-import { CONFIG } from './config';
+import { CONFIG } from '../config';
 
 export class OpenAIService {
     private openai: OpenAI;

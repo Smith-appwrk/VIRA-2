@@ -1,5 +1,5 @@
 import { OpenAIService } from './openaiService';
-import { CONFIG } from './config';
+import { CONFIG } from '../config';
 
 export class ContextService {
     private openaiService: OpenAIService;

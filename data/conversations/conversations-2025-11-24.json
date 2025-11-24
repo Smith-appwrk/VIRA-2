@@ -1,0 +1,30 @@
+{
+  "19:e85b760292c640c5bde770e0bb692e6d@thread.v2": [
+    {
+      "role": "user",
+      "name": "Smith G (APPWRK)",
+      "content": "I am getting an error that the trailer is not matching.",
+      "timestamp": 1763988513360,
+      "groupId": "19:e85b760292c640c5bde770e0bb692e6d@thread.v2"
+    },
+    {
+      "role": "assistant",
+      "content": "It sounds like you're encountering a \"different tractor or trailer number\" error. To resolve this, please verify that the trailer number and tractor number you entered match the ones registered in the system for your active driver. Additionally, check the driver history to see if any updates occurred after check-in. If everything seems correct but you’re still facing issues, let me know!",
+      "timestamp": 1763988518144,
+      "groupId": "19:e85b760292c640c5bde770e0bb692e6d@thread.v2"
+    },
+    {
+      "role": "user",
+      "name": "Smith G (APPWRK)",
+      "content": "How can I check in a driver to pick up LIV1008843 when it was booked as live but already loaded on a trailer because a driver yesterday did not wait for the trailer to be loaded? The original driver bobtailed out yesterday.  \nTeam--please advise---this is HW business that must pick up today. Thank you.  \nImportant!  \nGarg, Vishal ANWER, TARIQUE anyone available on this chat to advise on HW trailer?  \nImportant!  \nIs anyone monitoring this chat today? Please advise.  \n\nEveryone, anyone available to assist with the issue on LIV1008843--Please advise.....thank you.  \n\nWe're checking.  \n\nDriver is at the gate now---they have been here for 30 min.  \n\nGive us some time; we will update you.  \n\nJones, Mary You can change the appointment as Drop and then register the driver as BOB - Loaded Drop.  \n\nOnce it's loaded we cannot update anything in Intelligate or BY.  \n\nThat's the issue here....Live driver showed up, was loaded but left before his trailer was loaded.  \n\nNow if someone can update to drop in the background where it would allow the driver to get checked in, that's the only scenario that will fix this.  \n\nJones, Mary  \nOnce it's loaded we cannot update anything in Intelligate or BY.  \n\nFrom UL reporting were you not able to update to drop?  \n\nGarg, Vishal No---once loaded it didn't allow the change. Pradeep, GL was able to do a backend update.  \n\nRobert and Ryan, Trailer 26575 is coming back for a rework, send it to DDE195. Is he checking in?  \nEEhrenberg, Generic B  \nIs he checking in?  \n\nOn his way back.  \nYeah, but will he check in or just go straight to the door?  \nEEhrenberg, Generic B  \nYeah, but will he check in or just go straight to the door?  \n\nHe will check in.  \n\nEEhrenberg, Generic J  \nThe printer did not work for load# LIV1008685........  \n\nHi team,  \nSorry, I saw this message just now, are you still facing issues with the printer?  \nSince I got here, no, but most LIVs come Monday through Friday.  \nEEhrenberg, Generic  \nSince I got here, no, but most LIVs come Monday through Friday.  \n\nOkay, please let me know if this happens again. I’ll also check the logs for the last reported incident.",
+      "timestamp": 1763988538528,
+      "groupId": "19:e85b760292c640c5bde770e0bb692e6d@thread.v2"
+    },
+    {
+      "role": "assistant",
+      "content": "It seems like you're dealing with a complex situation regarding the LIV1008843 pickup. Since the original driver bobtailed out before the trailer was loaded, you can change the appointment type to \"Drop\" and then register the driver as \"BOB - Loaded Drop.\" This adjustment should allow you to check in the driver properly.\n\nHowever, if you've encountered issues with making changes due to the trailer already being loaded, it might require backend support from your IT team or someone with administrative access. If that's an option for you, reaching out for assistance would be beneficial. Please keep everyone updated on any progress made!",
+      "timestamp": 1763988543921,
+      "groupId": "19:e85b760292c640c5bde770e0bb692e6d@thread.v2"
+    }
+  ]
+}

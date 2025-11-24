@@ -1,7 +1,7 @@
 import { RAGService } from './ragService';
 import { ContextService } from './contextService';
 import { OpenAIService } from './openaiService';
-import { CONFIG } from './config';
+import { CONFIG } from '../config';
 
 export class AIAgentService {
     private openaiService: OpenAIService;

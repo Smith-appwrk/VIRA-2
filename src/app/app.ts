@@ -4,23 +4,27 @@ import { ManagedIdentityCredential } from '@azure/identity';
 import { LocalStorage } from "@microsoft/teams.common";
 import * as fs from 'fs';
 import * as path from 'path';
-import config from "../config";
 import { OpenAIService } from "../services/openaiService";
 import { ConversationService } from "../services/conversationService";
 import { ImageService } from "../services/imageService";
 import { AIAgentService } from "../services/aiAgentService";
+
+import { KnowledgeBaseReviewService } from "../services/knowledgeBaseReviewService";
+import { DailySummaryScheduler } from "../services/dailySummaryScheduler";
+import { CONFIG } from "../config";
 import { HybridGraphService } from "../services/hybridGraphService";
-import { CONFIG } from "../services/config";
 
 // Create storage for conversation history
 const storage = new LocalStorage();
 
 // Initialize services
-const openaiService = new OpenAIService(config.openAIKey || '');
-const conversationService = new ConversationService(config.MESSAGE_RETENTION_COUNT);
+const openaiService = new OpenAIService(CONFIG.OPENAI_API_KEY || '');
+const conversationService = new ConversationService(CONFIG.MESSAGE_RETENTION_COUNT);
 const imageService = new ImageService();
 const aiAgentService = new AIAgentService(openaiService);
 const graphService = new HybridGraphService();
+const kbReviewService = new KnowledgeBaseReviewService(openaiService, conversationService);
+const dailyScheduler = new DailySummaryScheduler(kbReviewService);
 
 // Load knowledge base and initialize AI Agent
 let intelligateContent = '';
@@ -83,7 +87,7 @@ const tokenCredentials: TokenCredentials = {
   token: createTokenFactory()
 };
 
-const credentialOptions = config.MicrosoftAppType === "UserAssignedMsi" ? { ...tokenCredentials } : undefined;
+const credentialOptions = CONFIG.MicrosoftAppType === "UserAssignedMsi" ? { ...tokenCredentials } : undefined;
 
 const app = new App({
   ...credentialOptions,
@@ -103,6 +107,21 @@ function shouldRespond(activity: any): boolean {
 
   return shouldReply;
 }
+
+// Helper function to check if message is from KB Review group
+function isKBReviewGroup(activity: any): boolean {
+  const conversationId = activity.conversation?.id || '';
+  return conversationId === CONFIG.KNOWLEDGE_REVIEW_GROUP_ID;
+}
+
+// Helper function to check if user can review KB
+function canReviewKB(activity: any): boolean {
+  const userName = activity.from?.name?.toLowerCase().replaceAll(' ', '') || '';
+  return CONFIG.KB_REVIEW_USERS.includes(userName);
+}
+
+// Store active summaries with their message IDs
+const activeSummaries = new Map<string, string>(); // messageId -> summaryId
 
 // Helper function to process user input
 async function processUserInput(activity: any, tokenFactory: (scope: string | string[], tenantId?: string) => Promise<string>): Promise<string> {
@@ -229,6 +248,12 @@ app.on('message', async ({ send, activity }) => {
     conversationId: activity.conversation?.id
   });
 
+  // Handle KB Review group messages first
+  if (isKBReviewGroup(activity)) {
+    await handleKBReviewMessage(send, activity);
+    return;
+  }
+
   // Check if bot should respond
   if (!shouldRespond(activity)) {
     console.log('[App] Bot should not respond to this message');
@@ -260,7 +285,8 @@ app.on('message', async ({ send, activity }) => {
       role: 'user',
       name: activity.from?.name || 'User',
       content: userQuery,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      groupId: activity.conversation?.id || null
     });
 
     // Find relevant images
@@ -365,7 +391,8 @@ app.on('message', async ({ send, activity }) => {
     conversationService.addMessageToHistory(conversationId, {
       role: 'assistant',
       content: response,
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      groupId: activity.conversation?.id || null
     });
 
     // Update storage
@@ -387,5 +414,100 @@ app.on('message', async ({ send, activity }) => {
     await send('Sorry, I encountered an error while processing your message. Please try again.');
   }
 });
+
+// Handle KB Review group messages
+async function handleKBReviewMessage(send: any, activity: any): Promise<void> {
+  try {
+    const messageText = activity.text || '';
+    const messageId = activity.id;
+    const replyToId = activity.replyToId;
+
+    // Check if this is a reply to a summary message
+    if (replyToId) {
+      // Try to find the summary ID from the reply chain
+      let summaryId: string | undefined = activeSummaries.get(replyToId);
+      
+      // If not found in direct mapping, check if the parent message contains summary info
+      // This handles cases where the reply chain might be deeper
+      if (!summaryId) {
+        // Try to extract from message metadata or check recent summaries
+        for (const [msgId, sumId] of activeSummaries.entries()) {
+          // In Teams, replyToId might reference a different message in the chain
+          // We'll check if any active summary exists
+          summaryId = sumId;
+          break; // Use the first available summary
+        }
+      }
+
+      if (summaryId) {
+        if (!canReviewKB(activity)) {
+          await send('You are not authorized to review knowledge base entries.');
+          return;
+        }
+
+        const reviewerName = activity.from?.name || 'Unknown';
+        const result = await kbReviewService.processReviewResponse(messageText, reviewerName, summaryId);
+        
+        if (result.processed) {
+          await send(result.message);
+        } else {
+          await send(`Unable to process review: ${result.message}`);
+        }
+        return;
+      }
+    }
+
+    // Check if this is a new summary request or if user is asking for summary
+    const lowerText = messageText.toLowerCase();
+    if (lowerText.includes('summary') || lowerText.includes('review') || lowerText.includes('generate')) {
+      if (!canReviewKB(activity)) {
+        await send('You are not authorized to request knowledge base summaries.');
+        return;
+      }
+      
+      // Trigger summary generation
+      await dailyScheduler.triggerSummaryNow();
+      const pendingSummary = dailyScheduler.getPendingSummary();
+      
+      if (pendingSummary) {
+        const summaryActivity = new MessageActivity(pendingSummary.message);
+        const sentActivity = await send(summaryActivity);
+        
+        // Store the summary ID with the message ID for reply tracking
+        // Use the activity ID if available, otherwise use a generated key
+        const key = sentActivity?.id || messageId || `summary_${Date.now()}`;
+        activeSummaries.set(key, pendingSummary.summary.summaryId);
+        
+        // Also store with summary ID for reverse lookup
+        console.log(`[App] Stored summary ${pendingSummary.summary.summaryId} with key ${key}`);
+      } else {
+        await send('No new knowledge entries to review at this time.');
+      }
+      return;
+    }
+
+    // Check for pending summaries to send (when bot receives any message in KB Review group)
+    const pendingSummary = dailyScheduler.getPendingSummary();
+    if (pendingSummary) {
+      const summaryActivity = new MessageActivity(pendingSummary.message);
+      const sentActivity = await send(summaryActivity);
+      
+      if (sentActivity && sentActivity.id) {
+        activeSummaries.set(sentActivity.id, pendingSummary.summary.summaryId);
+        console.log(`[App] Sent daily summary ${pendingSummary.summary.summaryId} with message ID ${sentActivity.id}`);
+      }
+    }
+
+  } catch (error: any) {
+    console.error('[App] Error handling KB review message:', error);
+    await send('Sorry, I encountered an error while processing the knowledge base review.');
+  }
+}
+
+// Start the daily summary scheduler
+if (CONFIG.KNOWLEDGE_ANALYSIS_ENABLED) {
+  dailyScheduler.start();
+  console.log('[App] Knowledge base review system initialized');
+}
 
 export default app;

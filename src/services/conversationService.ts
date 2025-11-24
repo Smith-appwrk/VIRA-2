@@ -102,6 +102,9 @@ export class ConversationService {
                 history.slice(history.length - this.MESSAGE_RETENTION_COUNT)
             );
         }
+
+        // Save to disk after adding message (only current date for efficiency)
+        this.saveConversationsForDate(new Date(message.timestamp));
     }
 
     getConversationHistory(conversationId: string): Message[] {
@@ -132,6 +135,62 @@ export class ConversationService {
                 deletedConversations: deletedCount,
                 timestamp: new Date().toISOString()
             });
+        }
+    }
+
+    private saveConversationsForDate(date: Date): void {
+        try {
+            const dateStr = date.toISOString().split('T')[0];
+            const filePath = this.getConversationFilePath(date);
+            
+            // Get all conversations that have messages on this date
+            const dateConversations: Record<string, Message[]> = {};
+            
+            for (const [conversationId, messages] of this.conversationHistory.entries()) {
+                const dateMessages = messages.filter(msg => {
+                    const msgDate = new Date(msg.timestamp).toISOString().split('T')[0];
+                    return msgDate === dateStr;
+                });
+                
+                if (dateMessages.length > 0) {
+                    dateConversations[conversationId] = dateMessages;
+                }
+            }
+
+            // Load existing and merge
+            let existingConversations: Record<string, Message[]> = {};
+            if (fs.existsSync(filePath)) {
+                try {
+                    existingConversations = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+                } catch (error) {
+                    console.error(`[ConversationService] Error reading existing file:`, error);
+                }
+            }
+
+            // Merge conversations
+            for (const [conversationId, messages] of Object.entries(dateConversations)) {
+                if (!existingConversations[conversationId]) {
+                    existingConversations[conversationId] = [];
+                }
+
+                // Add new messages, avoiding duplicates
+                for (const message of messages) {
+                    const exists = existingConversations[conversationId].some(
+                        m => m.timestamp === message.timestamp && m.content === message.content
+                    );
+                    if (!exists) {
+                        existingConversations[conversationId].push(message);
+                    }
+                }
+
+                // Sort by timestamp
+                existingConversations[conversationId].sort((a, b) => a.timestamp - b.timestamp);
+            }
+
+            // Save to file
+            fs.writeFileSync(filePath, JSON.stringify(existingConversations, null, 2));
+        } catch (error) {
+            console.error('[ConversationService] Error saving conversations for date:', error);
         }
     }
 }
