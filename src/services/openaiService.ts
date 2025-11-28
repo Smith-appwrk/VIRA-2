@@ -451,5 +451,128 @@ Output: {
         });
         return completion.choices[0].message.content?.trim() || text;
     }
+
+    async generateEmbedding(text: string): Promise<number[]> {
+        try {
+            const response = await this.openai.embeddings.create({
+                model: CONFIG.OPENAI_EMBEDDING_MODEL,
+                input: text,
+                dimensions: CONFIG.OPENAI_EMBEDDING_DIMENSIONS
+            });
+
+            return response.data[0].embedding;
+        } catch (error) {
+            console.error('[OpenAIService] Error generating embedding:', error);
+            throw error;
+        }
+    }
+
+    async generateEmbeddings(texts: string[]): Promise<number[][]> {
+        try {
+            const response = await this.openai.embeddings.create({
+                model: CONFIG.OPENAI_EMBEDDING_MODEL,
+                input: texts,
+                dimensions: CONFIG.OPENAI_EMBEDDING_DIMENSIONS
+            });
+
+            return response.data.map(item => item.embedding);
+        } catch (error) {
+            console.error('[OpenAIService] Error generating embeddings:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * Score the relevance of retrieved knowledge chunks to the user query
+     * Returns a confidence score between 0 and 1
+     */
+    async scoreRelevance(query: string, knowledgeChunks: string[]): Promise<{
+        confidence: number;
+        relevantChunks: string[];
+        reasoning: string;
+    }> {
+        if (!knowledgeChunks || knowledgeChunks.length === 0) {
+            return {
+                confidence: 0,
+                relevantChunks: [],
+                reasoning: "No knowledge chunks provided",
+            };
+        }
+
+        try {
+            const prompt = `You are a strict relevance evaluator. Your job is to determine if the retrieved knowledge base content is ACTUALLY relevant to answering the user's question.
+
+CRITICAL RULES:
+1. Only return HIGH confidence (>= 0.9) if the knowledge DIRECTLY answers the question
+2. Return LOW confidence (< 0.7) if the knowledge is only tangentially related or requires inference
+3. Return ZERO confidence if the knowledge is unrelated or insufficient
+
+User Question: "${query}"
+
+Retrieved Knowledge Base Content:
+${knowledgeChunks.map((chunk, i) => `[Chunk ${i + 1}]\n${chunk}`).join("\n\n")}
+
+Evaluate each chunk and return a JSON object with this exact structure:
+{
+  "confidence": 0.0-1.0,
+  "relevantChunks": ["chunk content that is relevant", ...],
+  "reasoning": "Brief explanation of why confidence is high/low"
+}
+
+Confidence scoring guide:
+- 0.9-1.0: Knowledge directly answers the question with specific, relevant information
+- 0.7-0.89: Knowledge is related but may require some inference or is partially relevant
+- 0.5-0.69: Knowledge is only tangentially related or provides general context
+- 0.0-0.49: Knowledge is not relevant or insufficient to answer the question
+
+IMPORTANT: Be strict. Only include chunks that DIRECTLY help answer the question.`;
+
+            const completion = await this.openai.chat.completions.create({
+                model: CONFIG.OPENAI_MODEL,
+                messages: [
+                    {
+                        role: "system",
+                        content: "You are a strict relevance evaluator. You must be conservative and only mark content as relevant if it directly answers the question.",
+                    },
+                    { role: "user", content: prompt },
+                ],
+                temperature: 0.1, // Low temperature for consistent scoring
+                response_format: { type: "json_object" },
+            });
+
+            const responseContent = completion.choices[0].message.content || '{}';
+            const result = JSON.parse(responseContent);
+
+            // Validate and normalize confidence score
+            let confidence = typeof result.confidence === 'number' 
+                ? Math.max(0, Math.min(1, result.confidence))
+                : 0;
+
+            // Ensure relevantChunks is an array
+            const relevantChunks = Array.isArray(result.relevantChunks)
+                ? result.relevantChunks
+                : result.relevantChunks
+                    ? [result.relevantChunks]
+                    : [];
+
+            const reasoning = result.reasoning || "No reasoning provided";
+
+            console.log(`[OpenAIService] Relevance score: ${confidence.toFixed(3)}, Reasoning: ${reasoning}`);
+
+            return {
+                confidence,
+                relevantChunks,
+                reasoning,
+            };
+        } catch (error) {
+            console.error('[OpenAIService] Error scoring relevance:', error);
+            // Fallback: return low confidence if scoring fails
+            return {
+                confidence: 0.3,
+                relevantChunks: [],
+                reasoning: "Error during relevance scoring - defaulting to low confidence",
+            };
+        }
+    }
 }
 

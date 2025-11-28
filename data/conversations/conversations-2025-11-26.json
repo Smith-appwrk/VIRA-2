@@ -1,0 +1,78 @@
+{
+  "19:e85b760292c640c5bde770e0bb692e6d@thread.v2": [
+    {
+      "role": "user",
+      "name": "Smith G (APPWRK)",
+      "content": "Trailer present but not in system",
+      "timestamp": 1764148734994,
+      "groupId": "19:e85b760292c640c5bde770e0bb692e6d@thread.v2"
+    },
+    {
+      "role": "assistant",
+      "content": "To resolve the issue of a trailer being physically present but not in the system, please inform the welcome center team. They will assist by creating the trailer entry in the system for you.",
+      "timestamp": 1764148740618,
+      "groupId": "19:e85b760292c640c5bde770e0bb692e6d@thread.v2"
+    },
+    {
+      "role": "user",
+      "name": "Smith G (APPWRK)",
+      "content": "We have had a couple drivers today that will manually enter a trailer number for the empty they want to take out and the system will give them a check mark and everything. We validate the driver and the system will change their trailer. This just happened to driver 364227, i checked him in and then checked after to make sure he got the correct trailer, everything was good. When he went to leave, system is showing a different trailer for him to take out.\r\nIm wondering if it has to do with the fact that the validation will still ask us for outgoing reference even though they put a specific trailer number in. Ive had this happen a few times in the past but it’s becoming more common now. I mainly notice it with NFBR trailers.",
+      "timestamp": 1764148776449,
+      "groupId": "19:e85b760292c640c5bde770e0bb692e6d@thread.v2"
+    },
+    {
+      "role": "assistant",
+      "content": "It sounds like you're encountering an issue where the system is not recognizing the manually entered trailer number correctly, leading to discrepancies when drivers attempt to leave. This could be related to how the system processes validations, particularly if it still requires an outgoing reference despite having a specified trailer number.\n\nTo address this, I recommend checking whether the trailer numbers are registered correctly in the system and ensuring they are listed as available in the yard. If this problem persists, it may be beneficial to reach out to your IT support team for further assistance, as there might be underlying issues with how NFBR trailers are being processed.",
+      "timestamp": 1764148782133,
+      "groupId": "19:e85b760292c640c5bde770e0bb692e6d@thread.v2"
+    },
+    {
+      "role": "user",
+      "name": "Smith G (APPWRK)",
+      "content": "Trailer present but not in systemTrailer present but not in system\r\n ",
+      "timestamp": 1764154004955,
+      "groupId": "19:e85b760292c640c5bde770e0bb692e6d@thread.v2"
+    },
+    {
+      "role": "assistant",
+      "content": "If a trailer is physically present but not registered in the system, please notify the welcome center team. They will assist by creating the trailer entry in the system for you.",
+      "timestamp": 1764154012371,
+      "groupId": "19:e85b760292c640c5bde770e0bb692e6d@thread.v2"
+    },
+    {
+      "role": "user",
+      "name": "Smith G (APPWRK)",
+      "content": "How we can change the truck tire ?",
+      "timestamp": 1764156654749,
+      "groupId": "19:e85b760292c640c5bde770e0bb692e6d@thread.v2"
+    },
+    {
+      "role": "assistant",
+      "content": "To change a truck tire, you'll need to follow these basic steps:\n\n1. **Safety First**: Ensure the truck is on a flat surface and turn on hazard lights. Use wheel chocks to prevent rolling.\n2. **Loosen Lug Nuts**: Using a lug wrench, loosen the lug nuts slightly while the tire is still on the ground.\n3. **Lift the Truck**: Use a jack to lift the truck until the tire is off the ground.\n4. **Remove Lug Nuts and Tire**: Fully remove the loosened lug nuts and take off the flat tire.\n5. **Install New Tire**: Place the spare or new tire onto the hub, aligning it with bolt holes.\n6. **Tighten Lug Nuts**: Hand-tighten all lug nuts before lowering back down and then tighten them properly in a crisscross pattern.\n\nAlways refer to your specific vehicle's manual for any unique procedures or safety recommendations related to changing tires!",
+      "timestamp": 1764156662238,
+      "groupId": "19:e85b760292c640c5bde770e0bb692e6d@thread.v2"
+    },
+    {
+      "role": "user",
+      "name": "Smith G (APPWRK)",
+      "content": "How we can change the truck tire ?",
+      "timestamp": 1764156714032,
+      "groupId": "19:e85b760292c640c5bde770e0bb692e6d@thread.v2"
+    }
+  ],
+  "19:b06bf8fddba2412fbed4ca0dce4d73ad@thread.v2": [
+    {
+      "role": "user",
+      "name": "Smith G (APPWRK)",
+      "content": "Trailer present but not in system",
+      "timestamp": 1764154229295,
+      "groupId": "19:b06bf8fddba2412fbed4ca0dce4d73ad@thread.v2"
+    },
+    {
+      "role": "assistant",
+      "content": "To resolve the issue of a trailer being physically present but not listed in the system, please inform the welcome center team. They will assist by creating the trailer entry in the system for you.",
+      "timestamp": 1764154236460,
+      "groupId": "19:b06bf8fddba2412fbed4ca0dce4d73ad@thread.v2"
+    }
+  ]
+}

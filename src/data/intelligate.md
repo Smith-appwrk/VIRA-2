@@ -1,339 +1,258 @@
-# IntelliGate FAQ Knowledge Base
+Q: QR code not getting scanned
+A:
 
-## Driver Questions
+- Avoid using any QR scanning app
+- Hold mobile camera steady in front of QR code until a link popup appears
+- Try using Google Lens as an alternative (access via Google.com camera icon)
 
-### QR Code Issues
+Q: How to scan QR code?
+A: - Look for google bar on phone and click on google lens
 
-- **Issue**: QR code not getting scanned
-- **Solution**:
-  - Avoid using any QR scanning app
-  - Hold mobile camera steady in front of QR code until a link popup appears
-  - Try using Google Lens as an alternative (access via Google.com camera icon)
-
-### How to scan QR code?
-
-- Look for google bar on phone and click on google lens
 - Hold camera steady in front of QR code until a link popup appears
 - Application will be opened
 
-### Getting a blank screen after licence Scan
+Q: Getting a blank screen after licence Scan
+A: - Please follow the steps on 'how to scan the QR code?'
 
-- Please follow the steps on 'how to scan the QR code?'
 - If still facing an issue, it might be due to network coverage
 - Check with gate agent who can help with your registration
 
-### Registration Options
-
-#### Coming In Options
+Q: Coming In Options meaning ( Empty, loaded, bobtail )
+A:
 
 - **Empty**: Select if coming with an empty trailer
 - **Loaded**: Select if coming with a delivery load
 - **Bobtail**: Select if not coming with any trailer
 
-#### Going Out Options
+Q: Going out Options meaning ( Empty, loaded, bobtail )
+A:
 
 - **Empty**: Select if taking an empty trailer while leaving
 - **Loaded**: Select if picking up a load
 - **Bobtail**: Select if not taking out any trailer
 
-#### Carrier Company Selection
+Q: how to select Carrier Company Selection
+A: - For delivering a load: Enter company name from inbound BOL
 
-- For delivering a load: Enter company name from inbound BOL
 - For dropping empty trailer: Select company name the trailer belongs to
 - For taking out empty trailer: Not needed if you know preferred trailer number
 - If carrier not found: Type a few letters to search, or contact Gate agent
 
-### Common Issues
-
-#### Cannot find carrier name
+Q: Cannot find carrier name
+A:
 
 - Search by typing a few letters
 - Contact Gate agent if not found
 
-#### Finding pickup number
+Q: Finding pickup number
+A: - Check with your carrier company for pickup/outbound load number
 
-- Check with your carrier company for pickup/outbound load number
+Q: Finding inbound load number
+A: - Check BOL document (number typically starts with 019)
 
-#### Finding inbound load number
-
-- Check BOL document (number typically starts with 019)
 - You can also enter shipment number starting with 034
 - Contact Gate agent if unable to find
 
-#### Getting shipment number not valid error
+Q: Getting shipment number not valid error
+A: - Recheck if the site selected is correct
 
-- Recheck if the site selected is correct
 - Check if scenario selection is correct
 - If still getting invalid value, reach out to Gate Agent
 
-#### Getting 'Can not allow early check in' error
+Q: Getting 'Can not allow early check in' error
+A: - You will see details of what time the appointment is scheduled
 
-- You will see details of what time the appointment is scheduled
 - You will not be able to register until the time mentioned in the message
 
-#### Getting Preferred trailer not valid error
+Q: Getting Preferred trailer not valid error
+A: - Recheck the trailer number entered
 
-- Recheck the trailer number entered
 - It means there is no trailer present in the yard with the provided preferred trailer
 
-#### Getting no Empty Trailer number available
+Q: Getting no Empty Trailer number available
+A: - It means that there are no empty trailers available for the carrier company to take out
 
-- It means that there are no empty trailers available for the carrier company to take out
+Q: License validation issues
+A: - Check license validity
 
-#### License validation issues
-
-- Check license validity
 - Contact gate agent for further instructions
 
-#### How to scan driver's Licence?
+Q: How to scan driver's Licence?
+A: - Allow the camera access to browser
 
-- Allow the camera access to browser
 - Scan the front side of licence
 - Scan the back side of licence
 - Allow some time to get the licence scanned
 - Once completed, your details will be populated
 
-#### Timeout during license scan
+Q: Timeout during license scan
+A: - It might be due to network issue
 
-- It might be due to network issue
 - Select 'unable to scan' to enter details manually
 - Reach out to Gate Agent for bypass code
 
-#### OTP not received
+Q: OTP not received
+A: - Check mobile network signal
 
-- Check mobile network signal
 - Verify mobile number is correct
 - Try 'Resend Code'
 - Check with validators for passcode
 
-#### Employee ID requirement
+Q: Employee ID requirement
+A: - System asks for Employee ID and last 4 digits of license for fast pass process
 
-- System asks for Employee ID and last 4 digits of license for fast pass process
 - Get credentials from carrier company
 - Click 'skip login' to proceed with license scan process
 - If you have tablet mounted on your truck, you will receive OTP on your tablet
 
-## Validator Questions
+Q: If driver cannot scan license
+A: - Ask driver to click 'unable to Scan' and provide site Passcode
 
-### Driver Registration Issues
+Q: If driver cannot scan QR code
+A: - Ask driver to use Google Lens
 
-- If driver cannot scan license:
-  - Ask driver to click 'unable to Scan' and provide site Passcode
-- If driver cannot scan QR code:
-  - Ask driver to use Google Lens
-  - Help driver register from your tab if needed
+- Help driver register from your tab if needed
 
-### How to check the site selected by Driver
+Q: How to check the site selected by Driver
+A: - Check on right side top corner for the site selected
 
-- Check on right side top corner for the site selected
 - Ask the driver to go back and change site if wrong site is selected
 
-### Application Issues
+Q: App not responding
+A: 1. Go to home page and find IntelliGate Application icon 2. Long press on IntelliGate application icon 3. Click on ⓘ button 4. Click force stop 5. Reopen the application 6. If issues persist, restart tablet or contact UL IT support
 
-#### App not responding
+Q: Blank screen
+A: 1. Long press on IntelliGate application icon 2. Click on ⓘ button 3. Scroll to "storage" 4. Click "clear cache" 5. Click "clear data" → "delete" 6. Return to home page and reopen app
 
-1. Go to home page and find IntelliGate Application icon
-2. Long press on IntelliGate application icon
-3. Click on ⓘ button
-4. Click force stop
-5. Reopen the application
-6. If issues persist, restart tablet or contact UL IT support
+Q: If drivers aren't receiving texts
+A: - Check sent messages tab
 
-#### Blank screen
+- Communicate details directly
 
-1. Long press on IntelliGate application icon
-2. Click on ⓘ button
-3. Scroll to "storage"
-4. Click "clear cache"
-5. Click "clear data" → "delete"
-6. Return to home page and reopen app
+Q: For ad hoc messages
+A: - Use active driver screen
 
-### Communication Issues
+- Click 'Send Message' for specific driver
 
-- If drivers aren't receiving texts:
-  - Check sent messages tab
-  - Communicate details directly
-- For ad hoc messages:
-  - Use active driver screen
-  - Click 'Send Message' for specific driver
+Q: Overweight trailer return
+A: - Ask driver to register as "empty to empty live"
 
-### Driver Process Issues
-
-#### Overweight trailer return
-
-- Ask driver to register as "empty to empty live"
 - Confirm which door to proceed to for rework
 
-#### Driver is overweight but not checked out yet
+Q: Driver is overweight but not checked out yet
+A: - Check with workflow team to send the driver for rework
 
-- Check with workflow team to send the driver for rework
 - Ask the driver to go to that door
 - Search the O/B trailer number in yard check & update yard location
 - Send ad hoc message to the driver if needed
 
-#### Incorrect preferred trailer
+Q: Incorrect preferred trailer
+A: - Check if driver registered with preferred trailer option
 
-- Check if driver registered with preferred trailer option
 - Verify trailer is in Yard (not at 'ANYWHERE' location)
 - Edit driver in active driver screen to update outbound trailer number
-- For SCAC option issues:
-  - Check if trailer SCAC matches driver's registered SCAC
-  - Update outbound SCAC if different
 
-### Information Lookup
+Q: For SCAC option issues
+A: - Check if trailer SCAC matches driver's registered SCAC
 
-- Find driver history:
-  - Click on driver number column hyperlink or use 'driver history' page
-- Find trailer history:
-  - Go to 'trailer activity' page and filter by trailer number
+- Update outbound SCAC if different
 
-### How to update the user?
+Q: Find driver history
+A: - Click on driver number column hyperlink or use 'driver history' page
 
-1. Go to control panel --> Users new
-2. Search with the username
-3. Click on Edit (Pencil Symbol)
-4. Make the updates and save
+Q: Find trailer history
+A: - Go to 'trailer activity' page and filter by trailer number
 
-## Check In Issues
+Q: How to update the user?
+A: 1. Go to control panel --> Users new 2. Search with the username 3. Click on Edit (Pencil Symbol) 4. Make the updates and save
 
-### "Error missing argument: new Yard Loc"
+Q: Error missing argument: new Yard Loc
+A: - Location not assigned to driver
 
-- Location not assigned to driver
 - Check with IG support team
 
-### "ERROR NO TEXT FOUND"
+Q: ERROR NO TEXT FOUND
+A: - Error in BY system
 
-- Error in BY system
 - Check with IG support team
 
-### "UC_PRC_SELF_DRIVER_CHECK_IN"
+Q: UC_PRC_SELF_DRIVER_CHECK_IN
+A: - Missing driver attributes:
 
-- Missing driver attributes:
-  - For empty: I/B trailer number and I/B SCAC required
-  - For loaded: I/B trailer number, I/B SCAC and I/B load numbers required
-  - Edit and add missing attributes
+- For empty: I/B trailer number and I/B SCAC required
+- For loaded: I/B trailer number, I/B SCAC and I/B load numbers required
+- Edit and add missing attributes
 
-### "504 timeout error"
+Q: 504 timeout error
+A: - Connection issue between IntelliGate and WMS
 
-- Connection issue between IntelliGate and WMS
 - Raise issue with UL IT team
 
-### "Can not change transport equipment once loading has started error"
+Q: Can not change transport equipment once loading has started error
+A: - Driver is trying to register for a live appointment, but workflow team has already loaded or started loading on a different trailer
 
-- Driver is trying to register for a live appointment, but workflow team has already loaded or started loading on a different trailer
 - Connect with workflow team to check on next steps
 
-### Trailer Status is empty in IG but loaded in BY
+Q: Trailer Status is empty in IG but loaded in BY
+A: - Get confirmation from yard jockey regarding the status of the trailer
 
-- Get confirmation from yard jockey regarding the status of the trailer
 - If trailer is loaded, identify the load attached to it
 - Ask workflow team to attach the load to the trailer
 - If issues persist, connect with UL IT support team
 
-## Check Out Issues
+Q: Different tractor or Trailer number was registered at the time of Check in
+A: 1. Check the trailer number and tractor number in active driver 2. Search the driver in driver history and check if details were updated after check-in 3. If yes, change the tractor number in active driver 4. Search the trailer in trailer activity to check if it is dispatched 5. If the trailer is dispatched from BY, connect with UL IT team to revert the dispatch
 
-### "Different tractor or Trailer number was registered at the time of Check in"
+Q: Trailer number not matching with Seal number
+A: 1. Physically check seal on trailer 2. Go to Yard check page, search trailer number 3. Update correct seal in yard check page 4. Proceed with Check-out
 
-1. Check the trailer number and tractor number in active driver
-2. Search the driver in driver history and check if details were updated after check-in
-3. If yes, change the tractor number in active driver
-4. Search the trailer in trailer activity to check if it is dispatched
-5. If the trailer is dispatched from BY, connect with UL IT team to revert the dispatch
+Q: The inventory's status is not a valid status for the outbound order's progression
+A: - Inventory for load is on hold
 
-### "Trailer number not matching with Seal number"
-
-1. Physically check seal on trailer
-2. Go to Yard check page, search trailer number
-3. Update correct seal in yard check page
-4. Proceed with Check-out
-
-### "The inventory's status is not a valid status for the outbound order's progression"
-
-- Inventory for load is on hold
 - Check with workflow team regarding inventory status
 - Proceed after confirmation from workflow team
 
-### "Invalid Equipment Status"
+Q: Invalid Equipment Status
+A: - Trailer status in BY is different than expected
 
-- Trailer status in BY is different than expected
 - Check with workflow team
 - Proceed after confirmation
 
-### "Trailer you are trying to pick up does not contain outbound load XXXX"
+Q: Trailer you are trying to pick up does not contain outbound load XXXX
+A: - Mismatch between trailer load and registered O/B load
 
-- Mismatch between trailer load and registered O/B load
 - Check O/B load in active driver screen
 - Confirm correct load number and update
 
-### "Carrier code for load does not match with carrier code for transport equipment"
+Q: Carrier code for load does not match with carrier code for transport equipment
+A: - Connect with customer support to correct carrier with correct SCAC
 
-- Connect with customer support to correct carrier with correct SCAC
 - Update load number, I/B & O/B SCACs in active driver
 
-### "UC_TRLR_DISP_SELF_DRVR error"
+Q: UC_TRLR_DISP_SELF_DRVR error
+A: - This is a system MOCA error
 
-- This is a system MOCA error
 - Check with UL IT team
 
-## Work Queue Team
+Q: Marking trailer as damaged
+A: 1. Go to Yard check 2. Filter by trailer number 3. Click on Edit (Pencil Icon) 4. Update Trailer Condition 5. Provide reason and save
 
-### Marking trailer as damaged
+Q: Unauthorized error/frozen screen
+A: 1. Close app using 'Home' button 2. Long press on SDC app logo 3. Click ⓘ button 4. Click Force Stop 5. Reopen and login
 
-1. Go to Yard check
-2. Filter by trailer number
-3. Click on Edit (Pencil Icon)
-4. Update Trailer Condition
-5. Provide reason and save
+Q: Yard audit process
+A: - Go to Yard Check
 
-### Common Issues
-
-- Trailer and truck incorrect
-- Incorrect scenario selected by driver
-- Wrong reference selected
-- Rename incorrect trailer number from yard check
-- Active move on trailer - ask spotter or work queue to complete move
-- Trailer is at door - reach out to work queue to move trailer to yard
-- Empty trailer not available - change the scenario
-- Trailer note not captured when marking trailer as damaged
-- Want to reserve Empty during check in - add in trailer note
-- Appointment type incorrect live/drop - reach out to customer service
-- Driver entered incorrect trailer number for checkout
-- Driver entered outgoing trailer different from system assigned trailer
-- Driver selected incorrect outgoing scenario
-- Create immediate move for spotters
-- Communicating with spotter for completing yard move
-
-## Spotter Questions
-
-### Unauthorized error/frozen screen
-
-1. Close app using 'Home' button
-2. Long press on SDC app logo
-3. Click ⓘ button
-4. Click Force Stop
-5. Reopen and login
-
-### Yard audit process
-
-- Go to Yard Check
 - Filter with starting letters of yard (e.g., DDN for locations DDN01-DDN49)
 - Update location/trailer if discrepancies found
 
-### Trailer present but not in system
+Q: Trailer present but not in system
+A: - Inform welcome centre team
 
-- Inform welcome centre team
 - They will create the trailer in the system
 
-### Trailer present physically at location not matching with system
-
-1. Open Yard Check
-2. Look for the location
-3. Click on update
-4. Click on "Update Other Attributes"
-5. Click on Swap Trailer
-6. Provide the trailer number which is physically present at the location
-
-# Dynamic Response Templates
+Q: Trailer present physically at location not matching with system
+A: 1. Open Yard Check 2. Look for the location 3. Click on update 4. Click on "Update Other Attributes" 5. Click on Swap Trailer 6. Provide the trailer number which is physically present at the location
 
 Q: What is the status of load <number>?
 A: This load is <percentage>% loaded, it will take another <hours> hours to complete Loading, Thank you for your patience.
@@ -344,20 +263,20 @@ A: It is scheduled for <date> <time>.
 Q: Can you change appointment to now?
 A: Sure, i can do that, please enter secret pin to change appointment time.
 
-Q. I don't have any pin
-A. Ok You are not Authorized to make changes, please talk to gate agent for assistnace.
+Q: I don't have any pin
+A: Ok You are not Authorized to make changes, please talk to gate agent for assistnace.
 
-Q. PIN is <1001>
-A. This is not a valid PIN.
+Q: PIN is <1001>
+A: This is not a valid PIN.
 
-Q. ok try this, 1002
-A. Success, Appointment for your load is updated!!
+Q: ok try this, 1002
+A: Success, Appointment for your load is updated!!
 
-Q. is ANSH a valid SCAC?
-A. Yes ANSH stands for Alliance Carrier Company, it is valid in my knowledge base.
+Q: is ANSH a valid SCAC?
+A: Yes ANSH stands for Alliance Carrier Company, it is valid in my knowledge base.
 
-Q. what about XXXX
-A. Sorry, XXXX is not a valid scac.
+Q: what about XXXX
+A: Sorry, XXXX is not a valid scac.
 
 Q: How many appointments are left for today?
 A: We had <total> appointments scheduled for today. Out of which <pending> are still pending.
@@ -369,32 +288,20 @@ Details:
 - <trailer_number> Arrived At: <date>
 - <trailer_number> Arrived At: <date>
 
----
+Q: send me email of all empty trailer
+A: Currently i am not configured to send email alerts.
 
-Q. send me email of all empty trailer
-A. Currently i am not configured to send email alerts.
+Q: How many empty trailer we have for PMDT
+A: Currently we have 3 PMDT trailers in our yard.
 
----
+Q: Do we have any empty trailer for SHAF to give to driver.
+A: We have 2 empty trailer for SHAF but we need them to fulfill outbound loads.
 
-Q. How many empty trailer we have for PMDT
-A. Currently we have 3 PMDT trailers in our yard.
+Q: What is total detention charges build last month
+A: As per my calculation in the month of March 2025, we incurred <1230> USD in detention cost.
 
----
-
-Q. Do we have any empty trailer for SHAF to give to driver.
-A. We have 2 empty trailer for SHAF but we need them to fulfill outbound loads.
-
----
-
-Q. What is total detention charges build last month
-A. As per my calculation in the month of March 2025, we incurred <1230> USD in detention cost.
-
----
-
-Q. Who is the highest contributor
-A. ANSH drivers contributed most in building detention charges.
-
----
+Q: Who is the highest contributor
+A: ANSH drivers contributed most in building detention charges.
 
 Q: What's the demurrage cost for trailer <number>?
 A: Total calculated charges <amount> USD.

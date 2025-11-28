@@ -1,95 +1,136 @@
-import { OpenAIService } from './openaiService';
+import { OpenAIService } from "./openaiService";
+import { AzureSearchService } from "./azureSearchService";
+import { CONFIG } from "../config";
 
 export class RAGService {
-    private openaiService: OpenAIService;
-    private knowledgeBase: string = '';
-    private knowledgeChunks: string[] = [];
-    private initialized: boolean = false;
+  private openaiService: OpenAIService;
+  private azureSearchService?: AzureSearchService;
+  private knowledgeBase: string = "";
+  private knowledgeChunks: string[] = [];
+  private initialized: boolean = false;
+  private useVectorSearch: boolean = false;
 
-    constructor(openaiService: OpenAIService) {
-        this.openaiService = openaiService;
+  constructor(
+    openaiService: OpenAIService,
+    azureSearchService?: AzureSearchService
+  ) {
+    this.openaiService = openaiService;
+    this.azureSearchService = azureSearchService;
+    this.useVectorSearch =
+      !!CONFIG.AZURE_SEARCH_ENDPOINT && !!azureSearchService;
+  }
+
+  async initialize(knowledgeBaseContent: string): Promise<void> {
+    if (this.initialized) return;
+
+    this.knowledgeBase = knowledgeBaseContent;
+    this.knowledgeChunks = this.chunkText(knowledgeBaseContent);
+
+    // Initialize Azure AI Search if available
+    if (this.useVectorSearch && this.azureSearchService) {
+      try {
+        await this.azureSearchService.initialize();
+        console.log(
+          `[RAGService] Initialized with Azure AI Search (vector search enabled)`
+        );
+      } catch (error) {
+        console.warn(
+          "[RAGService] Azure AI Search initialization failed, falling back to keyword search:",
+          error
+        );
+        this.useVectorSearch = false;
+      }
     }
 
-    async initialize(knowledgeBaseContent: string): Promise<void> {
-        if (this.initialized) return;
-
-        this.knowledgeBase = knowledgeBaseContent;
-        this.knowledgeChunks = this.chunkText(knowledgeBaseContent);
-
-        console.log(`[RAGService] Initialized with ${this.knowledgeChunks.length} knowledge chunks`);
-        this.initialized = true;
+    if (!this.useVectorSearch) {
+      console.log(
+        `[RAGService] Initialized with ${this.knowledgeChunks.length} knowledge chunks (keyword search)`
+      );
     }
 
-    chunkText(text: string, maxChunkSize: number = 500): string[] {
-        const sections = text.split(/#{1,3}\s/);
-        const chunks: string[] = [];
+    this.initialized = true;
+  }
 
-        for (const section of sections) {
-            if (section.trim().length === 0) continue;
+  chunkText(text: string, maxChunkSize: number = 500): string[] {
+    const sections = text.split(/#{1,3}\s/);
+    const chunks: string[] = [];
 
-            if (section.length <= maxChunkSize) {
-                chunks.push(section.trim());
-            } else {
-                const paragraphs = section.split('\n\n');
-                let currentChunk = '';
+    for (const section of sections) {
+      if (section.trim().length === 0) continue;
 
-                for (const paragraph of paragraphs) {
-                    if ((currentChunk + paragraph).length <= maxChunkSize) {
-                        currentChunk += (currentChunk ? '\n\n' : '') + paragraph;
-                    } else {
-                        if (currentChunk) chunks.push(currentChunk.trim());
-                        currentChunk = paragraph;
-                    }
-                }
+      if (section.length <= maxChunkSize) {
+        chunks.push(section.trim());
+      } else {
+        const paragraphs = section.split("\n\n");
+        let currentChunk = "";
 
-                if (currentChunk) chunks.push(currentChunk.trim());
-            }
+        for (const paragraph of paragraphs) {
+          if ((currentChunk + paragraph).length <= maxChunkSize) {
+            currentChunk += (currentChunk ? "\n\n" : "") + paragraph;
+          } else {
+            if (currentChunk) chunks.push(currentChunk.trim());
+            currentChunk = paragraph;
+          }
         }
 
+        if (currentChunk) chunks.push(currentChunk.trim());
+      }
+    }
+
+    return chunks;
+  }
+
+  async findRelevantChunks(
+    query: string,
+    maxChunks: number = 3,
+    minScore: number = 0.032
+  ): Promise<string[]> {
+    try {
+      // Use hybrid search with score threshold
+      // Only returns results with similarity score >= minScore
+      const results = await this.azureSearchService.hybridSearch(
+        query,
+        maxChunks,
+        minScore // Minimum similarity threshold (0.7 = 70% similarity)
+      );
+
+      // Format results as chunks
+      const chunks = results.map((result) => {
+        // Prefer structured answer field if available, otherwise use content
+        return result.answer || result.content;
+      });
+
+      if (chunks.length > 0) {
+        console.log(
+          `[RAGService] Vector search found ${chunks.length} relevant chunks (score >= ${minScore})`
+        );
+        // Log scores for debugging
+        results.forEach((result, idx) => {
+          console.log(
+            `[RAGService] Chunk ${idx + 1} score: ${result.score.toFixed(3)}`
+          );
+        });
         return chunks;
+      } else {
+        console.log(
+          `[RAGService] No relevant chunks found (all results below ${minScore} threshold)`
+        );
+        return [];
+      }
+    } catch (error) {
+      console.error(
+        "[RAGService] Vector search failed, falling back to keyword search:",
+        error
+      );
+      // Fall through to keyword search
+      return [];
     }
+  }
 
-    async findRelevantChunks(query: string, maxChunks: number = 3): Promise<string[]> {
-        try {
-            const relevantChunks: Array<{ chunk: string; score: number }> = [];
-            const queryWords = query.toLowerCase().split(/\s+/);
-
-            for (const chunk of this.knowledgeChunks) {
-                let score = 0;
-                const chunkLower = chunk.toLowerCase();
-
-                for (const word of queryWords) {
-                    if (word.length < 3) continue;
-                    const regex = new RegExp(`\\b${word}`, 'gi');
-                    const matches = (chunkLower.match(regex) || []).length;
-                    score += matches * word.length;
-                }
-
-                if (chunkLower.includes(query.toLowerCase())) {
-                    score += query.length * 2;
-                }
-
-                if (score > 0) {
-                    relevantChunks.push({ chunk, score });
-                }
-            }
-
-            const topChunks = relevantChunks
-                .sort((a, b) => b.score - a.score)
-                .slice(0, maxChunks)
-                .map(item => item.chunk);
-
-            console.log(`[RAGService] Found ${topChunks.length} relevant chunks for query: "${query}"`);
-            return topChunks;
-
-        } catch (error) {
-            console.error('[RAGService] Error finding relevant chunks:', error);
-            return this.knowledgeChunks.slice(0, maxChunks);
-        }
-    }
-
-    async getContextForQuery(query: string, maxChunks: number = 3): Promise<string[]> {
-        return await this.findRelevantChunks(query, maxChunks);
-    }
+  async getContextForQuery(
+    query: string,
+    maxChunks: number = 3
+  ): Promise<string[]> {
+    return await this.findRelevantChunks(query, maxChunks);
+  }
 }
-
