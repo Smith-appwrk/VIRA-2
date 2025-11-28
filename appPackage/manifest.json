@@ -14,12 +14,12 @@
         "outline": "outline.png"
     },
     "name": {
-        "short": "VIRA-2${{APP_NAME_SUFFIX}}",
-        "full": "full name for VIRA-2"
+        "short": "VIRA${{APP_NAME_SUFFIX}}",
+        "full": "full name for VIRA"
     },
     "description": {
-        "short": "short description for VIRA-2",
-        "full": "full description for VIRA-2"
+        "short": "short description for VIRA",
+        "full": "full description for VIRA"
     },
     "accentColor": "#FFFFFF",
     "bots": [
