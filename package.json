@@ -18,7 +18,6 @@
         "dev": "nodemon --exec node --inspect=9239 --signal SIGINT -r ts-node/register ./src/index.ts",
         "build": "tsc --build && shx cp -r ./src/app/instructions.txt ./lib/src/app && shx cp -r ./src/data ./lib/src && shx mkdir -p ./lib/src/data/conversations && shx mkdir -p ./lib/src/data/graphs",
         "start": "node ./lib/src/index.js",
-        "test": "echo \"Error: no test specified\" && exit 1",
         "watch": "nodemon --exec \"npm run start\"",
         "migrate:kb": "ts-node scripts/migrateKnowledgeBase.ts"
     },
