@@ -85,9 +85,20 @@ const createTokenFactory = () => {
       const tokenResponse = await managedIdentityCredential.getToken(scopes, {
         tenantId: tenantId,
       });
+
+      if (!tokenResponse || !tokenResponse.token) {
+        throw new Error("Token response is empty");
+      }
+
       return tokenResponse.token;
     } catch (error) {
-      console.log(error);
+      console.error("[App] Error getting token:", error);
+      // Re-throw to prevent undefined token
+      throw new Error(
+        `Failed to get authentication token: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
     }
   };
 };
