@@ -190,6 +190,24 @@ flowchart TD
 - **Cache**: Performance optimization for recent conversations
 - **OpenAI**: Intent analysis, relevance scoring, response generation
 
+## Deployment
+
+### Manual Web App Setup
+
+The Web App (Azure App Service) is created manually to avoid quota issues. See [MANUAL_WEBAPP_SETUP.md](./MANUAL_WEBAPP_SETUP.md) for detailed setup instructions.
+
+**Quick Steps**:
+1. Create Web App in Azure Portal (Node.js 20, Linux/Windows)
+2. Assign Managed Identity (created by deployment)
+3. Set environment variables (CLIENT_ID, TENANT_ID, BOT_TYPE, etc.)
+4. Set `BOT_DOMAIN` environment variable: `your-webapp-name.azurewebsites.net`
+5. Deploy your code to the Web App
+6. Run `teamsapp provision` to register the bot
+
+The ARM template now only creates:
+- **Managed Identity** (for bot authentication)
+- **Bot Service Registration** (connects to your Web App)
+
 ## Get Started
 
 > **Prerequisites**
@@ -199,6 +217,7 @@ flowchart TD
 > - [Node.js](https://nodejs.org/), supported versions: 20, 22
 > - [Microsoft 365 Agents Toolkit Visual Studio Code Extension](https://aka.ms/teams-toolkit) version 5.0.0 and higher or [Microsoft 365 Agents Toolkit CLI](https://aka.ms/teamsfx-toolkit-cli)
 > - An account with [OpenAI](https://platform.openai.com/).
+> - Azure subscription with Web App quota (or create manually)
 
 > For local debugging using Microsoft 365 Agents Toolkit CLI, you need to do some extra steps described in [Set up your Microsoft 365 Agents Toolkit CLI for local debugging](https://aka.ms/teamsfx-cli-debugging).
 
