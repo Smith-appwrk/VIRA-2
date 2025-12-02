@@ -77,22 +77,63 @@ const createTokenFactory = () => {
     scope: string | string[],
     tenantId?: string
   ): Promise<string> => {
+    const requestId = `token-${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(7)}`;
+    console.log(`[App] [${requestId}] Token acquisition started:`, {
+      scope: Array.isArray(scope) ? scope : [scope],
+      tenantId: tenantId || "NOT PROVIDED",
+      clientId: process.env.CLIENT_ID
+        ? `${process.env.CLIENT_ID.substring(0, 8)}...`
+        : "NOT SET",
+    });
+
     try {
       const managedIdentityCredential = new ManagedIdentityCredential({
         clientId: process.env.CLIENT_ID,
       });
+      console.log(`[App] [${requestId}] ManagedIdentityCredential created`);
+
       const scopes = Array.isArray(scope) ? scope : [scope];
+      console.log(`[App] [${requestId}] Requesting token with scopes:`, scopes);
+
       const tokenResponse = await managedIdentityCredential.getToken(scopes, {
         tenantId: tenantId,
       });
 
+      console.log(`[App] [${requestId}] Token response received:`, {
+        hasToken: !!tokenResponse?.token,
+        tokenLength: tokenResponse?.token?.length || 0,
+        expiresOn: tokenResponse?.expiresOnTimestamp
+          ? new Date(tokenResponse.expiresOnTimestamp).toISOString()
+          : "NOT SET",
+      });
+
       if (!tokenResponse || !tokenResponse.token) {
+        console.error(
+          `[App] [${requestId}] ⚠️  CRITICAL: Token response is empty!`,
+          {
+            tokenResponse: tokenResponse
+              ? "EXISTS BUT NO TOKEN"
+              : "NULL/UNDEFINED",
+          }
+        );
         throw new Error("Token response is empty");
       }
 
+      console.log(
+        `[App] [${requestId}] Token acquisition successful, token prefix:`,
+        tokenResponse.token.substring(0, 20) + "..."
+      );
       return tokenResponse.token;
-    } catch (error) {
-      console.error("[App] Error getting token:", error);
+    } catch (error: any) {
+      console.error(`[App] [${requestId}] ⚠️  ERROR getting token:`, {
+        errorType: error?.constructor?.name,
+        errorMessage: error?.message,
+        errorCode: error?.code,
+        errorName: error?.name,
+        stack: error?.stack?.split("\n").slice(0, 5).join("\n"),
+      });
       // Re-throw to prevent undefined token
       throw new Error(
         `Failed to get authentication token: ${
@@ -123,6 +164,17 @@ app.on("message", async ({ send, activity, ...rest }) => {
   console.log(`[App] Received message: ${activity.text}`, {
     from: activity.from?.name,
     conversationId: activity.conversation?.id,
+  });
+
+  // Log authentication state at message receipt
+  console.log("[App] Authentication state at message receipt:", {
+    clientId: process.env.CLIENT_ID
+      ? `${process.env.CLIENT_ID.substring(0, 8)}...`
+      : "NOT SET",
+    microsoftAppType: CONFIG.MicrosoftAppType,
+    hasTokenCredentials: !!tokenCredentials,
+    hasCredentialOptions: !!credentialOptions,
+    tenantId: activity.conversation?.tenantId,
   });
 
   // Handle KB Review group messages first
@@ -196,7 +248,26 @@ app.on("message", async ({ send, activity, ...rest }) => {
       }
 
       const errorActivity = new MessageActivity(errorText);
-      await send(errorActivity);
+      console.log("[App] Sending NO_ANSWER response:", {
+        conversationId,
+        textLength: errorText.length,
+        hasMentions: CONFIG.SUPPORT_USERS.length > 0,
+      });
+      try {
+        await send(errorActivity);
+        console.log("[App] NO_ANSWER response sent successfully");
+      } catch (sendError: any) {
+        console.error("[App] ERROR sending NO_ANSWER response:", {
+          errorType: sendError?.constructor?.name,
+          errorMessage: sendError?.message,
+          errorCode: sendError?.code,
+          status: sendError?.status || sendError?.response?.status,
+          authHeader:
+            sendError?.config?.headers?.Authorization ||
+            sendError?.config?.headers?.authorization,
+        });
+        throw sendError; // Re-throw to be caught by outer catch
+      }
       return;
     }
 
@@ -257,7 +328,29 @@ app.on("message", async ({ send, activity, ...rest }) => {
       (responseActivity as any).attachments = attachments;
     }
 
-    await send(responseActivity);
+    console.log("[App] Sending main response:", {
+      conversationId,
+      responseLength: finalResponse.length,
+      attachmentsCount: attachments.length,
+      hasGraph: !!graphPath,
+      hasImages: relevantImages.length > 0,
+    });
+    try {
+      await send(responseActivity);
+      console.log("[App] Main response sent successfully");
+    } catch (sendError: any) {
+      console.error("[App] ERROR sending main response:", {
+        errorType: sendError?.constructor?.name,
+        errorMessage: sendError?.message,
+        errorCode: sendError?.code,
+        status: sendError?.status || sendError?.response?.status,
+        authHeader:
+          sendError?.config?.headers?.Authorization ||
+          sendError?.config?.headers?.authorization,
+        requestUrl: sendError?.config?.url,
+      });
+      throw sendError; // Re-throw to be caught by outer catch
+    }
 
     // Update conversation history with assistant response (non-blocking)
     // Don't await - response is already sent, save in background
@@ -271,10 +364,295 @@ app.on("message", async ({ send, activity, ...rest }) => {
     // Cleanup old conversations
     // conversationService.cleanupOldConversations();
   } catch (error: any) {
-    console.error("[App] Error processing message:", error);
-    await send(
-      "Sorry, I encountered an error while processing your message. Please try again."
+    // Intense logging for error diagnosis
+    console.error("=".repeat(80));
+    console.error("[App] ERROR PROCESSING MESSAGE - DETAILED LOG");
+    console.error("[App] Timestamp:", new Date().toISOString());
+    console.error("=".repeat(80));
+
+    // Basic error information
+    console.error(
+      "[App] Error Type:",
+      error?.constructor?.name || typeof error
     );
+    console.error("[App] Error Message:", error?.message || String(error));
+    console.error("[App] Error Code:", error?.code);
+    console.error(
+      "[App] Error Status:",
+      error?.status || error?.response?.status
+    );
+    console.error(
+      "[App] Error Status Text:",
+      error?.statusText || error?.response?.statusText
+    );
+
+    // Activity context
+    console.error("[App] Activity Context:", {
+      conversationId: activity.conversation?.id,
+      conversationType: activity.conversation?.conversationType,
+      tenantId: activity.conversation?.tenantId,
+      fromId: activity.from?.id,
+      fromName: activity.from?.name,
+      channelId: activity.channelId,
+      activityType: activity.type,
+      text: activity.text?.substring(0, 100), // First 100 chars
+    });
+
+    // Axios-specific error details
+    if (error?.isAxiosError || error?.config) {
+      console.error("[App] Axios Error Details:");
+      console.error(
+        "  - Request URL:",
+        error?.config?.url || error?.request?.path
+      );
+      console.error(
+        "  - Request Method:",
+        error?.config?.method?.toUpperCase()
+      );
+
+      // Detailed header analysis
+      const headers = error?.config?.headers || {};
+      console.error(
+        "  - Request Headers (full):",
+        JSON.stringify(headers, null, 2)
+      );
+
+      const authHeader = headers.Authorization || headers.authorization;
+      console.error("  - Authorization Header (raw):", authHeader);
+      console.error("  - Authorization Header Type:", typeof authHeader);
+      console.error(
+        "  - Authorization Header Length:",
+        authHeader?.length || 0
+      );
+
+      if (authHeader) {
+        if (authHeader === "Bearer null" || authHeader === "Bearer undefined") {
+          console.error(
+            "  - ⚠️  CRITICAL: NULL/UNDEFINED TOKEN DETECTED IN AUTHORIZATION HEADER!"
+          );
+          console.error(
+            "  - This indicates token acquisition failed or returned null/undefined"
+          );
+        } else if (authHeader.startsWith("Bearer ")) {
+          const tokenPart = authHeader.substring(7);
+          console.error(
+            "  - Token Prefix:",
+            tokenPart.substring(0, 20) + "..."
+          );
+          console.error("  - Token Length:", tokenPart.length);
+        } else {
+          console.error(
+            "  - Authorization header format unexpected:",
+            authHeader.substring(0, 50)
+          );
+        }
+      } else {
+        console.error("  - ⚠️  CRITICAL: NO AUTHORIZATION HEADER FOUND!");
+      }
+
+      console.error(
+        "  - Request Data:",
+        error?.config?.data
+          ? typeof error?.config?.data === "string"
+            ? error.config.data.substring(0, 500)
+            : JSON.stringify(error.config.data).substring(0, 500)
+          : "N/A"
+      );
+
+      // Response details
+      if (error?.response) {
+        console.error("  - Response Status:", error.response.status);
+        console.error("  - Response Status Text:", error.response.statusText);
+        console.error(
+          "  - Response Headers:",
+          JSON.stringify(error.response.headers || {}, null, 2)
+        );
+        console.error(
+          "  - Response Data:",
+          JSON.stringify(error.response.data || {}, null, 2)
+        );
+      }
+
+      // Request object details
+      if (error?.request) {
+        console.error("  - Request Host:", error.request.host);
+        console.error("  - Request Path:", error.request.path);
+        console.error("  - Request Method:", error.request.method);
+        console.error("  - Request Headers Sent:", error.request._header);
+      }
+    }
+
+    // Token-related information - EXTENSIVE
+    console.error("[App] Authentication Context - DETAILED:");
+    console.error(
+      "  - CLIENT_ID env:",
+      process.env.CLIENT_ID
+        ? `${process.env.CLIENT_ID.substring(0, 8)}...`
+        : "NOT SET"
+    );
+    console.error(
+      "  - CLIENT_ID full length:",
+      process.env.CLIENT_ID?.length || 0
+    );
+    console.error("  - MicrosoftAppType:", CONFIG.MicrosoftAppType);
+    console.error("  - Has Token Factory:", !!createTokenFactory);
+    console.error(
+      "  - Token Credentials ClientId:",
+      tokenCredentials?.clientId
+        ? `${tokenCredentials.clientId.substring(0, 8)}...`
+        : "NOT SET"
+    );
+    console.error(
+      "  - Token Credentials Token Factory:",
+      typeof tokenCredentials?.token
+    );
+    console.error(
+      "  - Credential Options:",
+      credentialOptions ? "SET" : "NOT SET"
+    );
+    console.error("  - App Credentials:", app ? "APP EXISTS" : "NO APP");
+
+    // Try to diagnose token acquisition
+    try {
+      const tokenFactory = createTokenFactory();
+      console.error("  - Token Factory Created:", !!tokenFactory);
+      console.error("  - Token Factory Type:", typeof tokenFactory);
+
+      // Try to get a token (this might fail, but we'll catch it)
+      try {
+        const testScope = "https://api.botframework.com/.default";
+        const testTenantId = activity.conversation?.tenantId;
+        console.error("  - Attempting test token acquisition...");
+        console.error("    Scope:", testScope);
+        console.error("    TenantId:", testTenantId || "NOT PROVIDED");
+
+        const testToken = await tokenFactory(testScope, testTenantId);
+        console.error(
+          "    Token Acquired:",
+          testToken
+            ? `YES (length: ${testToken.length})`
+            : "NO - RETURNED NULL/UNDEFINED"
+        );
+        console.error(
+          "    Token Prefix:",
+          testToken ? testToken.substring(0, 20) + "..." : "N/A"
+        );
+
+        if (!testToken) {
+          console.error(
+            "    ⚠️  CRITICAL: Token factory returned null/undefined!"
+          );
+        }
+      } catch (tokenAcqError: any) {
+        console.error("    ⚠️  Token Acquisition FAILED:");
+        console.error("      Error Type:", tokenAcqError?.constructor?.name);
+        console.error("      Error Message:", tokenAcqError?.message);
+        console.error("      Error Code:", tokenAcqError?.code);
+        console.error(
+          "      Error Stack:",
+          tokenAcqError?.stack?.split("\n").slice(0, 5).join("\n")
+        );
+      }
+    } catch (tokenError: any) {
+      console.error("  - ⚠️  Token Factory Creation FAILED:");
+      console.error("    Error Type:", tokenError?.constructor?.name);
+      console.error("    Error Message:", tokenError?.message);
+      console.error(
+        "    Error Stack:",
+        tokenError?.stack?.split("\n").slice(0, 5).join("\n")
+      );
+    }
+
+    // Check Managed Identity environment
+    console.error("[App] Managed Identity Environment:");
+    console.error(
+      "  - MSI_ENDPOINT:",
+      process.env.MSI_ENDPOINT ? "SET" : "NOT SET"
+    );
+    console.error(
+      "  - MSI_SECRET:",
+      process.env.MSI_SECRET ? "SET" : "NOT SET"
+    );
+    console.error(
+      "  - IDENTITY_ENDPOINT:",
+      process.env.IDENTITY_ENDPOINT ? "SET" : "NOT SET"
+    );
+    console.error(
+      "  - IDENTITY_HEADER:",
+      process.env.IDENTITY_HEADER ? "SET" : "NOT SET"
+    );
+
+    // Stack trace with more context
+    console.error("[App] Stack Trace (first 30 lines):");
+    if (error?.stack) {
+      const stackLines = error.stack.split("\n");
+      stackLines.slice(0, 30).forEach((line: string, idx: number) => {
+        console.error(`  [${idx + 1}] ${line}`);
+      });
+    } else {
+      console.error("  No stack trace available");
+    }
+
+    // Full error object (limited depth to avoid circular references)
+    try {
+      const errorString = JSON.stringify(
+        error,
+        Object.getOwnPropertyNames(error),
+        2
+      );
+      console.error(
+        "[App] Full Error Object (first 3000 chars):",
+        errorString.substring(0, 3000)
+      );
+    } catch (stringifyError) {
+      console.error("[App] Could not stringify error object:", stringifyError);
+    }
+
+    console.error("=".repeat(80));
+
+    // Attempt to send error message, but catch any errors from send itself
+    try {
+      console.error("[App] Attempting to send error message to user...");
+      await send(
+        "Sorry, I encountered an error while processing your message. Please try again."
+      );
+      console.error("[App] Error message sent successfully");
+    } catch (sendError: any) {
+      console.error(
+        "[App] ⚠️  CRITICAL: Failed to send error message to user!"
+      );
+      console.error("[App] Send Error Type:", sendError?.constructor?.name);
+      console.error("[App] Send Error Message:", sendError?.message);
+      console.error("[App] Send Error Code:", sendError?.code);
+      console.error(
+        "[App] Send Error Status:",
+        sendError?.status || sendError?.response?.status
+      );
+      if (sendError?.config) {
+        const sendAuthHeader =
+          sendError.config.headers?.Authorization ||
+          sendError.config.headers?.authorization;
+        console.error("[App] Send Error Authorization Header:", sendAuthHeader);
+        console.error(
+          "[App] Send Error Authorization State:",
+          sendAuthHeader === "Bearer null" ||
+            sendAuthHeader === "Bearer undefined"
+            ? "NULL TOKEN - AUTHENTICATION FAILURE"
+            : "OK"
+        );
+        console.error("[App] Send Error Request URL:", sendError.config.url);
+        console.error(
+          "[App] Send Error Request Method:",
+          sendError.config.method
+        );
+      }
+      console.error(
+        "[App] This indicates a potential authentication/authorization issue with the Teams API"
+      );
+      console.error(
+        "[App] Root cause likely: Token acquisition failed or returned null/undefined"
+      );
+    }
   }
 });
 
