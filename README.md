@@ -267,3 +267,6 @@ To extend the Basic AI Chatbot template with more AI capabilities, explore [Team
 - [Microsoft 365 Agents Toolkit Documentations](https://docs.microsoft.com/microsoftteams/platform/toolkit/teams-toolkit-fundamentals)
 - [Microsoft 365 Agents Toolkit CLI](https://aka.ms/teamsfx-toolkit-cli)
 - [Microsoft 365 Agents Toolkit Samples](https://github.com/OfficeDev/TeamsFx-Samples)
+
+
+<!-- Security scan triggered at 2026-09-05 07:34:01 -->
